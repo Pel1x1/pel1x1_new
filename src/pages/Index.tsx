@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
 const Index = () => {
   return (
     <>
-      <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
+      <div className="h-screen bg-background flex flex-col items-center justify-center p-4">
         <PixelBlast
           variant="square"
           pixelSize={3}
@@ -23,6 +23,7 @@ const Index = () => {
           speed={1}
           edgeFade={0.1}
           transparent
+          className="h-[900px] sm:h-[100%] lg:h-[100%] xl:h-[100%]"
         />
           <BusinessCard/>
       </div>
