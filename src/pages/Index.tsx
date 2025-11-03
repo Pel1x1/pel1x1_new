@@ -11,7 +11,7 @@ const Index = () => {
         <PixelBlast
           variant="square"
           pixelSize={3}
-          color="#969696"
+          color="#dbdbdb"
           patternScale={2.5}
           patternDensity={0.5}
           pixelSizeJitter={0}
