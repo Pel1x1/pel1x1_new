@@ -37,6 +37,14 @@ const Projects = () => {
       images: ["/img/irina/1.png", "/img/irina/2.png", "/img/irina/3.png"],
       technologies: ["React", "Tailwind"]    
     },
+    {
+      id: 5,
+      title: "JungebadMoscow",
+      description: "Сайт о масляно-дисперсионных ваннах и восстановлении теплового баланса",
+      link: "https://jungebadmoscow.ru/",
+      images: ["/img/jungebad/1.png", "/img/jungebad/2.png", "/img/jungebad/3.png", "/img/jungebad/4.png", "/img/jungebad/5.png"],
+      technologies: ["React", "Tailwind", "Node.Js"]
+    },
     
   ];  
 
