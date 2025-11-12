@@ -10,7 +10,7 @@ const Projects = () => {
       title: "Загородный комплекс «ЗВЁЗДНЫЙ»",
       description: "Современный сайт отеля",
       link: "https://zvezdny-complex.ru/",
-      images: ["/img/zvezdny/1.png", "/img/zvezdny/2.png", "/img/zvezdny/3.png", "/img/zvezdny/4.png","/img/zvezdny/5.png"],
+      images: ["/img/zvezdny/1.webp", "/img/zvezdny/2.webp", "/img/zvezdny/3.webp", "/img/zvezdny/4.webp","/img/zvezdny/5.webp"],
       technologies: ["Next.Js", "TypeScript", "Strapi", "PostgreSQL", "Tailwind"]
     },
     {
@@ -18,7 +18,7 @@ const Projects = () => {
       title: "Постельное бельё «НЮКТА»",
       description: "Дизайнерский сайт магазина",
       link: "https://нюкта.рф",
-      images: ["/img/nukta/1.png", "/img/nukta/2.png", "/img/nukta/3.png"],
+      images: ["/img/nukta/1.webp", "/img/nukta/2.webp", "/img/nukta/3.webp"],
       technologies: ["React", "Tailwind", "Node.Js", "Strapi"]
     },
     {
@@ -26,7 +26,7 @@ const Projects = () => {
       title: "Клининг компания «Даймонд»",
       description: "Creative portfolio for artist",
       link: "https://diamondsupport.ru",
-      images: ["/img/diamond/1.png", "/img/diamond/2.png", "/img/diamond/3.png"],
+      images: ["/img/diamond/1.webp", "/img/diamond/2.webp", "/img/diamond/3.webp"],
       technologies: ["React", "Tailwind", "Strapi"]
     },
     {
@@ -34,7 +34,7 @@ const Projects = () => {
       title: "Визитка",
       description: "Сайт-визитка для ведущей мероприятий",
       link: "https://irinasemenova.ru",
-      images: ["/img/irina/1.png", "/img/irina/2.png", "/img/irina/3.png"],
+      images: ["/img/irina/1.webp", "/img/irina/2.webp", "/img/irina/3.webp"],
       technologies: ["React", "Tailwind"]    
     },
     {
@@ -42,7 +42,7 @@ const Projects = () => {
       title: "JungebadMoscow",
       description: "Сайт о масляно-дисперсионных ваннах и восстановлении теплового баланса",
       link: "https://jungebadmoscow.ru/",
-      images: ["/img/jungebad/1.png", "/img/jungebad/2.png", "/img/jungebad/3.png", "/img/jungebad/4.png", "/img/jungebad/5.png"],
+      images: ["/img/jungebad/1.webp", "/img/jungebad/2.webp", "/img/jungebad/3.webp", "/img/jungebad/4.webp", "/img/jungebad/5.webp"],
       technologies: ["React", "Tailwind", "Node.Js"]
     },
     
