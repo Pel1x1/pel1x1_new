@@ -25,7 +25,7 @@ const Projects = () => {
       id: 3,
       title: "Клининг компания «Даймонд»",
       description: "Creative portfolio for artist",
-      link: "https://diamondsupport.ru",
+      link: "https://jungebadmoscow.ru",
       images: ["/img/diamond/1.webp", "/img/diamond/2.webp", "/img/diamond/3.webp"],
       technologies: ["React", "Tailwind", "Strapi"]
     },
