@@ -51,16 +51,17 @@ const Prices = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background p-8">
+    <div className="min-h-screen p-8 bg-transparent pointer-events-auto">
       <div className="max-w-6xl mx-auto">
+
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
           <Link 
             to="/" 
             className="flex items-center gap-2 text-card-foreground hover:text-muted-foreground transition-colors"
           >
-            <ArrowLeft size={20} />
-            <span className="text-sm uppercase tracking-wider">Back</span>
+            <ArrowLeft size={20} color="#ffd3ff"/>
+            <span className="text-sm uppercase tracking-wider text-[#ffd3ff]">Back</span>
           </Link>
           <div className="h-px bg-card-border flex-1"></div>
           <h1 className="text-2xl font-bold text-card-foreground uppercase tracking-wider">Prices</h1>
@@ -69,14 +70,17 @@ const Prices = () => {
         {/* Pricing Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {pricingPlans.map((plan) => (
-            <Card key={plan.title} className="bg-card border-2 border-card-border p-8 shadow-xl">
-              <div className="space-y-6">
+            <Card
+              key={plan.title}
+              className="bg-card border-2 border-card-border p-8 shadow-xl h-[600px] flex flex-col"
+            >
+              <div className="space-y-6 flex-1">
                 {/* Plan Header */}
                 <div className="text-center">
-                  <h3 className="text-xl font-bold text-card-foreground uppercase tracking-wider mb-2">
+                  <h3 className="text-3xl font-bold text-card-foreground uppercase tracking-wider mb-2 text-[#ffd3ff]">
                     {plan.title}
                   </h3>
-                  <div className="text-3xl font-bold text-card-foreground mb-1">
+                  <div className="text-xl font-bold text-card-foreground mb-1">
                     {plan.price}
                   </div>
                   <div className="text-sm text-muted-foreground uppercase tracking-wider">
@@ -93,25 +97,27 @@ const Prices = () => {
                 <div className="space-y-3">
                   {plan.features.map((feature) => (
                     <div key={feature} className="flex items-center gap-3">
-                      <Check size={16} className="text-card-foreground flex-shrink-0" />
+                      <Check size={16} className="text-card-foreground flex-shrink-0" color="#ffd3ff" />
                       <span className="text-sm text-card-foreground">{feature}</span>
                     </div>
                   ))}
                 </div>
+              </div>
 
-                {/* Contact Button */}
-                <div className="pt-4">
-                  <a 
-                    href="https://t.me/k_k0stya" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="w-full block text-center py-3 px-6 border border-card-border text-card-foreground hover:bg-muted transition-colors uppercase tracking-wider text-sm"
-                  >
-                    Заказать
-                  </a>
-                </div>
+              {/* Contact Button */}
+              <div className="pt-4 mt-4">
+                <a
+                  href="https://t.me/k_k0stya"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full block text-center py-3 px-6 border border-card-border text-card-foreground hover:bg-muted 
+                  transition-colors uppercase tracking-wider text-sm "
+                >
+                  Заказать
+                </a>
               </div>
             </Card>
+
           ))}
         </div>
       </div>

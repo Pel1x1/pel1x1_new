@@ -6,32 +6,32 @@ const Technologies = () => {
   const techCategories = [
     {
       title: "Frontend",
-      icon: <Code size={24} />,
+      icon: <Code size={24} color="#ffd3ff"/>,
       technologies: ["React", "TypeScript", "Tailwind CSS", "Next.js", "Vue.js"],
       description: "Современные адаптивные интерфейсы с плавной анимацией и идеальным UX"
     },
     {
       title: "Backend",
-      icon: <Server size={24} />,
+      icon: <Server size={24} color="#ffd3ff"/>,
       technologies: ["Node.js", "Python", "PostgreSQL", "MongoDB", "REST API"],
       description: "Масштабируемая серверная архитектура с базами данных и безопасной аутентификацией"
     },
     {
       title: "Design",
-      icon: <Palette size={24} />,
+      icon: <Palette size={24} color="#ffd3ff"/>,
       technologies: ["Figma", "Adobe XD", "Photoshop", "Illustrator", "Blender"],
       description: "Красивый дизайн пользовательского интерфейса/UX от концепции до реализации"
     },
     {
       title: "Extra",
-      icon: <Zap size={24} />,
+      icon: <Zap size={24} color="#ffd3ff"/>,
       technologies: ["Docker", "AWS", "Git", "SEO", "Analytics"],
       description: "Развертывание, оптимизация и аналитика для достижения максимальной производительности"
     }
   ];
 
   return (
-    <div className="min-h-screen bg-background p-8">
+<div className="min-h-screen p-8 bg-transparent pointer-events-auto">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
@@ -39,8 +39,8 @@ const Technologies = () => {
             to="/" 
             className="flex items-center gap-2 text-card-foreground hover:text-muted-foreground transition-colors"
           >
-            <ArrowLeft size={20} />
-            <span className="text-sm uppercase tracking-wider">Back</span>
+            <ArrowLeft size={20} color="#ffd3ff"/>
+            <span className="text-sm uppercase tracking-wider text-[#ffd3ff]">Back</span>
           </Link>
           <div className="h-px bg-card-border flex-1"></div>
           <h1 className="text-2xl font-bold text-card-foreground uppercase tracking-wider">Technologies</h1>
@@ -53,7 +53,7 @@ const Technologies = () => {
               <div className="space-y-6">
                 {/* Category Header */}
                 <div className="flex items-center gap-3">
-                  <div className="text-card-foreground">{category.icon}</div>
+                  <div className="text-card-foreground ">{category.icon}</div>
                   <h3 className="text-xl font-bold text-card-foreground uppercase tracking-wider">
                     {category.title}
                   </h3>

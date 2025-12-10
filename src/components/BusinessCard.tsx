@@ -17,17 +17,18 @@ const BusinessCard = () => {
         <div>
           <h1 
             className="text-2xl
+              text-[#ffd3ff]
               sm:text-3xl
               md:text-4xl
               font-bold text-card-foreground mb-2">
             K <span className="text-xl">&</span> K
           </h1>
-          <div className="w-20 h-px bg-card-border mb-6"></div>
+          <div className="w-20 h-px  mb-6 bg-[#ffd3ff]"></div>
           <p 
           className="text-xs
             sm:text-sm
             md:text-base
-            text-muted-foreground uppercase tracking-wider mb-4">
+            text-card-foreground uppercase tracking-wider mb-4">
             Web решения для бизнеса.
           </p>
         </div>
@@ -47,22 +48,26 @@ const BusinessCard = () => {
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 text-sm text-card-foreground hover:text-muted-foreground transition-colors"
               >
-                <MessageCircle size={16} />
+                <MessageCircle size={16} color="#ffd3ff"/>
                 @k_k0stya
               </a>
             </div>
           </div>
           
           <div className="flex items-center gap-3">
-            <Mail size={16} className="text-muted-foreground" />
-            <a href="mailto:k.konstantin2212@gmail.com" className="tracking-wider relative after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-px after:bottom-0 after:left-0 after:bg-card-border after:origin-bottom-right after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-bottom-left"> 
+            <Mail size={16} className="text-muted-foreground" color="#ffd3ff"/>
+            <a href="mailto:k.konstantin2212@gmail.com" 
+            className="tracking-wider relative after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-px after:bottom-0 after:left-0 
+            after:bg-card-border after:origin-bottom-right after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-bottom-left"> 
               <span className="text-sm text-card-foreground font-mono">k.konstantin2212@gmail.com</span>
             </a>
           </div>
           
           <div className="flex items-center gap-3">
-            <Phone size={16} className="text-muted-foreground" />
-            <a href="mailto:k.konstantin2212@gmail.com" className="tracking-wider relative after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-px after:bottom-0 after:left-0 after:bg-card-border after:origin-bottom-right after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-bottom-left"> 
+            <Phone size={16} className="text-muted-foreground" color="#ffd3ff" />
+            <a href="mailto:k.konstantin2212@gmail.com" 
+            className="tracking-wider relative after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-px after:bottom-0 after:left-0 
+            after:bg-card-border after:origin-bottom-right after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-bottom-left"> 
               <span className="text-sm text-card-foreground font-mono">+7 (977) 860-90-72</span>
             </a>
           </div>

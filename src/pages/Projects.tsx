@@ -18,13 +18,13 @@ const Projects = () => {
       title: "Постельное бельё «НЮКТА»",
       description: "Дизайнерский сайт магазина",
       link: "https://нюкта.рф",
-      images: ["/img/nukta/1.webp", "/img/nukta/2.webp", "/img/nukta/3.webp"],
+      images: ["/img/nukta/1.webp", "/img/nukta/2.webp", "/img/nukta/3.webp", "/img/nukta/4.webp", "/img/nukta/5.webp"],
       technologies: ["React", "Tailwind", "Node.Js", "Strapi"]
     },
     {
       id: 3,
-      title: "Клининг компания «Даймонд»",
-      description: "Creative portfolio for artist",
+      title: "«Даймонд»",
+      description: "Сайт-визитка клиниг компании «Даймонд»",
       link: "https://jungebadmoscow.ru",
       images: ["/img/diamond/1.webp", "/img/diamond/2.webp", "/img/diamond/3.webp"],
       technologies: ["React", "Tailwind", "Strapi"]
@@ -40,7 +40,7 @@ const Projects = () => {
     {
       id: 5,
       title: "JungebadMoscow",
-      description: "Сайт о масляно-дисперсионных ваннах и восстановлении теплового баланса",
+      description: "Сайт о масляно-дисперсионных ваннах",
       link: "https://jungebadmoscow.ru/",
       images: ["/img/jungebad/1.webp", "/img/jungebad/2.webp", "/img/jungebad/3.webp", "/img/jungebad/4.webp", "/img/jungebad/5.webp"],
       technologies: ["React", "Tailwind", "Node.Js"]
@@ -49,7 +49,7 @@ const Projects = () => {
   ];  
 
   return (
-    <div className="min-h-screen bg-background p-8">
+<div className="min-h-screen p-8 bg-transparent pointer-events-auto">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
@@ -57,8 +57,8 @@ const Projects = () => {
             to="/" 
             className="flex items-center gap-2 text-card-foreground hover:text-muted-foreground transition-colors"
           >
-            <ArrowLeft size={20} />
-            <span className="text-sm uppercase tracking-wider">Back</span>
+            <ArrowLeft size={20} color="#ffd3ff"/>
+            <span className="text-sm uppercase tracking-wider text-[#ffd3ff]">Back</span>
           </Link>
           <div className="h-px bg-card-border flex-1"></div>
           <h1 className="text-2xl font-bold text-card-foreground uppercase tracking-wider">Projects</h1>

@@ -136,7 +136,6 @@ const createLiquidEffect = (texture: THREE.Texture, opts?: { strength?: number; 
       float intensity = tex.b;
 
       float wave = 0.5 + 0.5 * sin(uTime * uFreq + intensity * 6.2831853);
-
       float amt = uStrength * intensity * wave;
 
       uv += vec2(vx, vy) * amt;
@@ -169,6 +168,9 @@ const FRAGMENT_SRC = `
 precision highp float;
 
 uniform vec3  uColor;
+uniform vec3  uColorInner;
+uniform vec3  uColorMid;
+uniform vec3  uColorOuter;
 uniform vec2  uResolution;
 uniform float uTime;
 uniform float uPixelSize;
@@ -262,6 +264,17 @@ float maskDiamond(vec2 p, float cov){
   return step(abs(p.x - 0.49) + abs(p.y - 0.49), r);
 }
 
+// палитра по плотности соседей
+vec3 palette(float density) {
+  if (density > 0.66) {
+    return uColorInner;             // #fce1fc
+  } else if (density > 0.33) {
+    return mix(uColorOuter, uColorInner, smoothstep(0.33, 0.66, density));
+  } else {
+    return uColorOuter;             // #dbdbdb
+  }
+}
+
 void main(){
   float pixelSize = uPixelSize;
   vec2 fragCoord = gl_FragCoord.xy - uResolution * .5;
@@ -306,21 +319,92 @@ void main(){
   float h = fract(sin(dot(floor(fragCoord / uPixelSize), vec2(127.1, 311.7))) * 43758.5453);
   float jitterScale = 1.0 + (h - 0.5) * uPixelJitter;
   float coverage = bw * jitterScale;
-  float M;
-  if      (uShapeType == SHAPE_CIRCLE)   M = maskCircle (pixelUV, coverage);
-  else if (uShapeType == SHAPE_TRIANGLE) M = maskTriangle(pixelUV, pixelId, coverage);
-  else if (uShapeType == SHAPE_DIAMOND)  M = maskDiamond(pixelUV, coverage);
-  else                                   M = coverage;
 
+  // ---- локальная плотность соседей ----
+  float neighborSum = 0.0;
+  float sampleCount = 0.0;
+  int R = 2; // радиус по сетке (5x5)
+
+  for (int ox = -2; ox <= 2; ++ox) {
+    for (int oy = -2; oy <= 2; ++oy) {
+      if (abs(ox) > R || abs(oy) > R) continue;
+
+      vec2 nid = pixelId + vec2(float(ox), float(oy));
+      vec2 nFrag = (nid + 0.5) * pixelSize;
+
+      vec2 nCellId    = floor(nFrag / cellPixelSize);
+      vec2 nCellCoord = nCellId * cellPixelSize;
+      vec2 nuv        = nCellCoord / uResolution * vec2(aspectRatio, 1.0);
+
+      float nbase = fbm2(nuv, uTime * 0.05);
+      nbase       = nbase * 0.5 - 0.65;
+      float nfeed = nbase + (uDensity - 0.5) * 0.3;
+
+      float nbayer = Bayer8(nFrag / uPixelSize) - 0.5;
+      float nbw    = step(0.5, nfeed + nbayer);
+
+      float nh      = fract(sin(dot(floor(nFrag / uPixelSize), vec2(127.1, 311.7))) * 43758.5453);
+      float njitter = 1.0 + (nh - 0.5) * uPixelJitter;
+      float ncoverage = nbw * njitter;
+
+      neighborSum += ncoverage;
+      sampleCount += 1.0;
+    }
+  }
+
+  float density = 0.0;
+  if (sampleCount > 0.0) {
+    density = clamp(neighborSum / sampleCount, 0.0, 1.0);
+  }
+
+    // базовая маска без влияния ripple
+  float baseMask;
+  if      (uShapeType == SHAPE_CIRCLE)   baseMask = maskCircle (pixelUV, coverage);
+  else if (uShapeType == SHAPE_TRIANGLE) baseMask = maskTriangle(pixelUV, pixelId, coverage);
+  else if (uShapeType == SHAPE_DIAMOND)  baseMask = maskDiamond(pixelUV, coverage);
+  else                                   baseMask = coverage;
+
+  // считаем отдельную маску только для ripple (по тем же кликам)
+  float rippleMask = 0.0;
+  if (uEnableRipples == 1) {
+    for (int i = 0; i < MAX_CLICKS; ++i){
+      vec2 pos = uClickPos[i];
+      if (pos.x < 0.0) continue;
+
+      float cellPixelSizeR = 8.0 * pixelSize;
+      vec2 cuv = (((pos - uResolution * .5 - cellPixelSizeR * .5) / (uResolution))) * vec2(aspectRatio, 1.0);
+      float t = max(uTime - uClickTimes[i], 0.0);
+      float r = distance(uv, cuv);
+      float waveR = speed * t;
+      float ring  = exp(-pow((r - waveR) / thickness, 2.0));
+      float atten = exp(-dampT * t) * exp(-dampR * r);
+      rippleMask = max(rippleMask, ring * atten * uRippleIntensity);
+    }
+  }
+
+  // edge fade к обеим маскам
   if (uEdgeFade > 0.0) {
     vec2 norm = gl_FragCoord.xy / uResolution;
     float edge = min(min(norm.x, norm.y), min(1.0 - norm.x, 1.0 - norm.y));
     float fade = smoothstep(0.0, uEdgeFade, edge);
-    M *= fade;
+    baseMask   *= fade;
+    rippleMask *= fade;
   }
 
-  vec3 color = uColor;
-  fragColor = vec4(color, M);
+  // цвет ткани по плотности (только палитра)
+  vec3 baseColor   = palette(density); // от #dbdbdb до #fce1fc
+  // цвет ряби — чистый uColor
+  vec3 rippleColor = uColor;
+
+  // сколько ripple добавляем поверх ткани
+  float rippleAmount = clamp(rippleMask, 0.0, 1.0);
+
+  vec3 finalColor = mix(baseColor, rippleColor, rippleAmount);
+
+  // альфа = объединение базовой маски и ripple (чтобы волны были видимы)
+  float finalAlpha = clamp(baseMask + rippleMask, 0.0, 1.0);
+
+  fragColor = vec4(finalColor, finalAlpha);
 }
 `;
 
@@ -365,6 +449,9 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
       uResolution: { value: THREE.Vector2 };
       uTime: { value: number };
       uColor: { value: THREE.Color };
+      uColorInner: { value: THREE.Color };
+      uColorMid: { value: THREE.Color };
+      uColorOuter: { value: THREE.Color };
       uClickPos: { value: THREE.Vector2[] };
       uClickTimes: { value: Float32Array };
       uShapeType: { value: number };
@@ -386,14 +473,18 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
     touch?: ReturnType<typeof createTouchTexture>;
     liquidEffect?: Effect;
   } | null>(null);
+
   const prevConfigRef = useRef<any>(null);
+
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
     speedRef.current = speed;
+
     const needsReinitKeys = ['antialias', 'liquid', 'noiseAmount'];
     const cfg = { antialias, liquid, noiseAmount };
     let mustReinit = false;
+
     if (!threeRef.current) mustReinit = true;
     else if (prevConfigRef.current) {
       for (const k of needsReinitKeys)
@@ -402,6 +493,7 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
           break;
         }
     }
+
     if (mustReinit) {
       if (threeRef.current) {
         const t = threeRef.current;
@@ -414,23 +506,33 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
         if (t.renderer.domElement.parentElement === container) container.removeChild(t.renderer.domElement);
         threeRef.current = null;
       }
+
       const canvas = document.createElement('canvas');
       const gl = canvas.getContext('webgl2', { antialias, alpha: true });
       if (!gl) return;
+
       const renderer = new THREE.WebGLRenderer({
         canvas,
         context: gl as WebGL2RenderingContext,
         antialias,
         alpha: true
       });
+
       renderer.domElement.style.width = '100%';
       renderer.domElement.style.height = '100%';
       renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
       container.appendChild(renderer.domElement);
+
       const uniforms = {
         uResolution: { value: new THREE.Vector2(0, 0) },
         uTime: { value: 0 },
         uColor: { value: new THREE.Color(color) },
+        // центр (самая большая плотность)
+        uColorInner: { value: new THREE.Color('#fce1fc') },
+        // средняя зона – можно ближе к центру или чуть темнее
+        uColorMid:   { value: new THREE.Color('#fce1fc') },
+        // края/самые редкие – серый
+        uColorOuter: { value: new THREE.Color('#dbdbdb') },
         uClickPos: {
           value: Array.from({ length: MAX_CLICKS }, () => new THREE.Vector2(-1, -1))
         },
@@ -446,6 +548,7 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
         uRippleIntensity: { value: rippleIntensityScale },
         uEdgeFade: { value: edgeFade }
       };
+
       const scene = new THREE.Scene();
       const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
       const material = new THREE.ShaderMaterial({
@@ -457,10 +560,13 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
         depthTest: false,
         depthWrite: false
       });
+
       const quadGeom = new THREE.PlaneGeometry(2, 2);
       const quad = new THREE.Mesh(quadGeom, material);
       scene.add(quad);
+
       const clock = new THREE.Clock();
+
       const setSize = () => {
         const w = container.clientWidth || 1;
         const h = container.clientHeight || 1;
@@ -470,9 +576,11 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
           threeRef.current.composer.setSize(renderer.domElement.width, renderer.domElement.height);
         uniforms.uPixelSize.value = pixelSize * renderer.getPixelRatio();
       };
+
       setSize();
       const ro = new ResizeObserver(setSize);
       ro.observe(container);
+
       const randomFloat = () => {
         if (typeof window !== 'undefined' && (window as any).crypto?.getRandomValues) {
           const u32 = new Uint32Array(1);
@@ -481,10 +589,13 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
         }
         return Math.random();
       };
+
       const timeOffset = randomFloat() * 1000;
+
       let composer: EffectComposer | undefined;
       let touch: ReturnType<typeof createTouchTexture> | undefined;
       let liquidEffect: Effect | undefined;
+
       if (liquid) {
         touch = createTouchTexture();
         touch.radiusScale = liquidRadius;
@@ -499,6 +610,7 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
         composer.addPass(renderPass);
         composer.addPass(effectPass);
       }
+
       if (noiseAmount > 0) {
         if (!composer) {
           composer = new EffectComposer(renderer);
@@ -519,7 +631,9 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
         if (composer && composer.passes.length > 0) composer.passes.forEach(p => ((p as any).renderToScreen = false));
         composer.addPass(noisePass);
       }
+
       if (composer) composer.setSize(renderer.domElement.width, renderer.domElement.height);
+
       const mapToPixels = (e: PointerEvent) => {
         const rect = renderer.domElement.getBoundingClientRect();
         const scaleX = renderer.domElement.width / rect.width;
@@ -533,6 +647,7 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
           h: renderer.domElement.height
         };
       };
+
       const onPointerDown = (e: PointerEvent) => {
         const { fx, fy } = mapToPixels(e);
         const ix = threeRef.current?.clickIx ?? 0;
@@ -540,17 +655,20 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
         uniforms.uClickTimes.value[ix] = uniforms.uTime.value;
         if (threeRef.current) threeRef.current.clickIx = (ix + 1) % MAX_CLICKS;
       };
+
       const onPointerMove = (e: PointerEvent) => {
         if (!touch) return;
         const { fx, fy, w, h } = mapToPixels(e);
         touch.addTouch({ x: fx / w, y: fy / h });
       };
+
       renderer.domElement.addEventListener('pointerdown', onPointerDown, {
         passive: true
       });
       renderer.domElement.addEventListener('pointermove', onPointerMove, {
         passive: true
       });
+
       let raf = 0;
       const animate = () => {
         if (autoPauseOffscreen && !visibilityRef.current.visible) {
@@ -574,6 +692,7 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
         raf = requestAnimationFrame(animate);
       };
       raf = requestAnimationFrame(animate);
+
       threeRef.current = {
         renderer,
         scene,
@@ -603,8 +722,10 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
       t.uniforms.uRippleThickness.value = rippleThickness;
       t.uniforms.uRippleSpeed.value = rippleSpeed;
       t.uniforms.uEdgeFade.value = edgeFade;
+
       if (transparent) t.renderer.setClearAlpha(0);
       else t.renderer.setClearColor(0x000000, 1);
+
       if (t.liquidEffect) {
         const uStrength = (t.liquidEffect as any).uniforms.get('uStrength');
         if (uStrength) uStrength.value = liquidStrength;
@@ -613,7 +734,9 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
       }
       if (t.touch) t.touch.radiusScale = liquidRadius;
     }
+
     prevConfigRef.current = cfg;
+
     return () => {
       if (threeRef.current && mustReinit) return;
       if (!threeRef.current) return;

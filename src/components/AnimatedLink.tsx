@@ -35,7 +35,7 @@ export default function AnimatedLink() {
   }, []);
 
   const base =
-    "text-xs sm:text-sm md:text-base text-card-foreground uppercase tracking-wider relative after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-px after:bottom-0 after:left-0 after:bg-card-border after:origin-bottom-right after:transition-transform after:duration-700 hover:after:scale-x-100 hover:after:origin-bottom-left";
+    "text-xs sm:text-sm md:text-base text-card-foreground uppercase tracking-wider relative after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-px after:bottom-0 after:left-0 after:bg-[#ffd3ff] after:origin-bottom-right after:transition-transform after:duration-700 hover:after:scale-x-100 hover:after:origin-bottom-left";
   const anim = "after:scale-x-100 after:origin-bottom-left";
 
   return (
