@@ -87,7 +87,7 @@ const BackgroundLayer: React.FC<{ variant: BackgroundKey }> = ({ variant }) => {
           particleBaseSize={100}
           moveParticlesOnHover = {true}
           alphaParticles={false}
-          disableRotation
+          disableRotation={false}
           
         />
       );
