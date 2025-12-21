@@ -15,7 +15,7 @@ import LiquidEther from '@/components/LiquidEther';
 import Antigravity from '@/components/Antigravity';
 import PixelSnow from '@/components/PixelSnow';
 
-const variants = [{/*"faulty", "antigravity", "particles", "ballpit", "pixel", "liquidether", "pixelsnow1", */}, "pixelsnow", ] as const;
+const variants = ["faulty", "antigravity", "particles", "ballpit", "pixel", "liquidether", "pixelsnow1", "pixelsnow", ] as const;
 type BackgroundKey = (typeof variants)[number];
 
 const getInitialBackground = (): BackgroundKey => {
@@ -40,7 +40,7 @@ const BackgroundLayer: React.FC<{ variant: BackgroundKey }> = ({ variant }) => {
           farPlane={28}
         />
       );
-    {/*case "pixelsnow1":
+    case "pixelsnow1":
       return(
         <PixelSnow 
           variant="snowflake"
@@ -158,7 +158,6 @@ const BackgroundLayer: React.FC<{ variant: BackgroundKey }> = ({ variant }) => {
             particleVariance={1}
           />
         );
-      */}
 
     default:
       return null;
