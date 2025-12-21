@@ -98,8 +98,7 @@ void main() {
       vec3 flakePos = 0.5 - 0.5 * cos(
         4.0 * sin(fpos.yzx * 0.073) +
         4.0 * sin(fpos.zxy * 0.27) +
-        2.0 * h +
-        uTime * uSpeed * 0.1 * vec3(7.0, 8.0, 5.0)
+        2.0 * h
       );
       flakePos = flakePos * 0.8 + 0.1 + fpos;
 
@@ -109,6 +108,7 @@ void main() {
         vec2 testUV = abs(vec2(dot(testPos, camI), dot(testPos, camJ)));
         float depth = dot(flakePos - camPos, camK);
         float flakeSize = max(uFlakeSize, uMinFlakeSize * depth * 0.5 / res.x);
+        
         float dist;
         if (uVariant < 0.5) dist = max(testUV.x, testUV.y);
         else if (uVariant < 1.5) dist = length(testUV);
@@ -216,7 +216,7 @@ export default function PixelSnow({
 
     const handleResize = () => {
       const w = container.offsetWidth,
-        h = container.offsetHeight;
+            h = container.offsetHeight;
       renderer.setSize(w, h);
       material.uniforms.uResolution.value.set(w, h);
     };

@@ -23,7 +23,7 @@ const BusinessCard = () => {
               font-bold text-card-foreground mb-2">
             K <span className="text-xl">&</span> K
           </h1>
-          <div className="w-20 h-px  mb-6 bg-[#ffd3ff]"></div>
+          <div className="w-[65px] lg:w-[85px] h-px  mb-6 bg-[#ffd3ff]"></div>
           <p 
           className="text-xs
             sm:text-sm
