@@ -15,7 +15,7 @@ import LiquidEther from '@/components/LiquidEther';
 import Antigravity from '@/components/Antigravity';
 import PixelSnow from '@/components/PixelSnow';
 
-const variants = ["faulty", "antigravity", "particles", "ballpit", "pixel", "liquidether", "pixelsnow1", "pixelsnow", ] as const;
+const variants = ["faulty", "antigravity", "particles", "pixel", "liquidether", "pixelsnow1", "pixelsnow", ] as const;
 type BackgroundKey = (typeof variants)[number];
 
 const getInitialBackground = (): BackgroundKey => {
@@ -95,17 +95,6 @@ const BackgroundLayer: React.FC<{ variant: BackgroundKey }> = ({ variant }) => {
           edgeFade={0.1}
           transparent
           className="w-full h-full"
-        />
-      );
-    case "ballpit":
-      return (
-        <Ballpit
-          count={100}
-          gravity={0.1}
-          friction={0.995}
-          wallBounce={0.95}
-          followCursor
-          colors={["#692699", "#692699", "#000000", "#000000"]}
         />
       );
     case "particles":

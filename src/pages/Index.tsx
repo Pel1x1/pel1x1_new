@@ -5,13 +5,13 @@ import { Link } from "react-router-dom";
 import Ballpit from '@/components/Ballpit.js'
 import Particles from '@/components/Particles';
 import FaultyTerminal from '@/components/FaultyTerminal';
-
+import { Analytics } from "@vercel/analytics/next"
 
 const Index = () => {
   return (
     <>
     <div className="h-screen flex flex-col items-center justify-center p-4 pointer-events-auto" >
-      
+      <Analytics/>
       <BusinessCard />
     </div>        
     
