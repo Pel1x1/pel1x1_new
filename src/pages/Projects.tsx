@@ -19,15 +19,15 @@ const Projects = () => {
       description: "Дизайнерский сайт магазина",
       link: "https://нюкта.рф",
       images: ["/img/nukta/1.webp", "/img/nukta/2.webp", "/img/nukta/3.webp", "/img/nukta/4.webp", "/img/nukta/5.webp"],
-      technologies: ["React", "Tailwind", "Node.Js", "Strapi"]
+      technologies: ["React", "Tailwind", "Node.Js", "MODX"]
     },
     {
       id: 3,
       title: "«Даймонд»",
       description: "Сайт-визитка клиниг компании «Даймонд»",
-      link: "https://jungebadmoscow.ru",
+      link: "https://diamondsupport.ru",
       images: ["/img/diamond/1.webp", "/img/diamond/2.webp", "/img/diamond/3.webp"],
-      technologies: ["React", "Tailwind", "Strapi"]
+      technologies: ["React", "Tailwind", "MODX"]
     },
     {
       id: 4,
@@ -43,8 +43,17 @@ const Projects = () => {
       description: "Сайт о масляно-дисперсионных ваннах",
       link: "https://jungebadmoscow.ru/",
       images: ["/img/jungebad/1.webp", "/img/jungebad/2.webp", "/img/jungebad/3.webp", "/img/jungebad/4.webp", "/img/jungebad/5.webp"],
-      technologies: ["React", "Tailwind", "Node.Js"]
+      technologies: ["React", "Tailwind", "Node.Js", "MODX"]
     },
+     {
+      id: 6,
+      title: "KiselevDA",
+      description: "Сайт юридической компании",
+      link: "",
+      images: ["/img/kiselev/1.png", "/img/kiselev/2.png", "/img/kiselev/3.png"],
+      technologies: ["React", "Tailwind", "Node.Js", "MODX"]
+    },
+    
     
   ];  
 
