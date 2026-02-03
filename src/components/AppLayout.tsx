@@ -14,8 +14,9 @@ import FaultyTerminal from "@/components/FaultyTerminal";
 import LiquidEther from '@/components/LiquidEther';
 import Antigravity from '@/components/Antigravity';
 import PixelSnow from '@/components/PixelSnow';
+import { BackgroundPaths } from "@/components/Background-paths"
 
-const variants = ["faulty", "antigravity", "particles", "pixel", "liquidether", "pixelsnow1", "pixelsnow", ] as const;
+const variants = ["faulty", "antigravity", "particles", "liquidether",  "pixelsnow","BackgroundPaths" ] as const;
 type BackgroundKey = (typeof variants)[number];
 
 const getInitialBackground = (): BackgroundKey => {
@@ -40,20 +41,9 @@ const BackgroundLayer: React.FC<{ variant: BackgroundKey }> = ({ variant }) => {
           farPlane={28}
         />
       );
-    case "pixelsnow1":
+    case "BackgroundPaths":
       return(
-        <PixelSnow 
-          variant="snowflake"
-          color="#ffd3ff"
-          flakeSize={0.03}
-          minFlakeSize={1.25}
-          pixelResolution={400}
-          speed={0.95}
-          density={0.1}
-          direction={85}
-          brightness={1}
-          farPlane={28}
-        />
+        <BackgroundPaths />
       );
     case "faulty":
       return (
@@ -77,26 +67,7 @@ const BackgroundLayer: React.FC<{ variant: BackgroundKey }> = ({ variant }) => {
           brightness={0.8}
         />
       );
-    case "pixel":
-      return (
-        <PixelBlast
-          variant="square"
-          pixelSize={3}
-          color="#fa57fa"
-          patternScale={3}
-          patternDensity={1.3}
-          pixelSizeJitter={0}
-          enableRipples
-          rippleSpeed={0.3}
-          rippleThickness={0.05}
-          rippleIntensityScale={0.25}
-          liquid={false}
-          speed={1}
-          edgeFade={0.1}
-          transparent
-          className="w-full h-full"
-        />
-      );
+   
     case "particles":
       return (
         <Particles
@@ -159,7 +130,7 @@ const AppLayout: React.FC = () => {
   return (
     <div className="min-h-screen relative overflow-hidden">
       {/* фон */}
-      <div className="absolute inset-0 -z-10">
+      <div className="-z-10 fixed inset-0">
         <BackgroundLayer variant={bg} />
       </div>
 
