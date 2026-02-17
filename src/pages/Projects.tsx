@@ -49,7 +49,7 @@ const Projects = () => {
       id: 6,
       title: "KiselevDA",
       description: "Сайт юридической компании",
-      link: "",
+      link: "https://kiselev-lawyer.ru/",
       images: ["/img/kiselev/1.png", "/img/kiselev/2.png", "/img/kiselev/3.png"],
       technologies: ["React", "Tailwind", "Node.Js", "MODX"]
     },
