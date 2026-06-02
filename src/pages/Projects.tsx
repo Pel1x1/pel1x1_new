@@ -1,134 +1,141 @@
-import { Card } from "@/components/ui/card";
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
-import { Link } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { useState, useRef, useEffect, type CSSProperties } from 'react';
+import { Link } from 'react-router-dom';
+import WebGLBackground from '@/components/WebGLBackground';
+import { projects, type Project } from '@/data/projects';
 
-const Projects = () => {
-  const projects = [
-    {
-      id: 1,
-      title: "Загородный комплекс «ЗВЁЗДНЫЙ»",
-      description: "Современный сайт отеля",
-      link: "https://zvezdny-complex.ru/",
-      images: ["/img/zvezdny/1.webp", "/img/zvezdny/2.webp", "/img/zvezdny/3.webp", "/img/zvezdny/4.webp","/img/zvezdny/5.webp"],
-      technologies: ["Next.Js", "TypeScript", "Strapi", "PostgreSQL", "Tailwind"]
-    },
-    {
-      id: 2,
-      title: "Постельное бельё «НЮКТА»",
-      description: "Дизайнерский сайт магазина",
-      link: "https://нюкта.рф",
-      images: ["/img/nukta/1.webp", "/img/nukta/2.webp", "/img/nukta/3.webp", "/img/nukta/4.webp", "/img/nukta/5.webp"],
-      technologies: ["React", "Tailwind", "Node.Js", "MODX"]
-    },
-    {
-      id: 3,
-      title: "«Даймонд»",
-      description: "Сайт-визитка клиниг компании «Даймонд»",
-      link: "https://diamondsupport.ru",
-      images: ["/img/diamond/1.webp", "/img/diamond/2.webp", "/img/diamond/3.webp"],
-      technologies: ["React", "Tailwind", "MODX"]
-    },
-    {
-      id: 4,
-      title: "Визитка",
-      description: "Сайт-визитка для ведущей мероприятий",
-      link: "https://irinasemenova.ru",
-      images: ["/img/irina/1.webp", "/img/irina/2.webp", "/img/irina/3.webp"],
-      technologies: ["React", "Tailwind"]    
-    },
-    {
-      id: 5,
-      title: "JungebadMoscow",
-      description: "Сайт о масляно-дисперсионных ваннах",
-      link: "https://jungebadmoscow.ru/",
-      images: ["/img/jungebad/1.webp", "/img/jungebad/2.webp", "/img/jungebad/3.webp", "/img/jungebad/4.webp", "/img/jungebad/5.webp"],
-      technologies: ["React", "Tailwind", "Node.Js", "MODX"]
-    },
-     {
-      id: 6,
-      title: "KiselevDA",
-      description: "Сайт юридической компании",
-      link: "https://kiselev-lawyer.ru/",
-      images: ["/img/kiselev/1.png", "/img/kiselev/2.png", "/img/kiselev/3.png"],
-      technologies: ["React", "Tailwind", "Node.Js", "MODX"]
-    },
-    
-    
-  ];  
+function ProjectCard({ project, index }: { project: Project; index: number }) {
+  const [currentImg, setCurrentImg] = useState(0);
+  const ref = useRef<HTMLDivElement>(null);
+  const [transform, setTransform] = useState('');
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!ref.current) return;
+    const rect = ref.current.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    setTransform(`perspective(900px) rotateX(${y * -3}deg) rotateY(${x * 3}deg) scale3d(1.005,1.005,1.005)`);
+  };
+
+  const handleMouseLeave = () => {
+    setTransform('perspective(900px) rotateX(0) rotateY(0) scale3d(1,1,1)');
+  };
+
+  const nextImg = (e: React.MouseEvent) => {
+    e.preventDefault(); e.stopPropagation();
+    setCurrentImg((c) => (c + 1) % project.images.length);
+  };
+  const prevImg = (e: React.MouseEvent) => {
+    e.preventDefault(); e.stopPropagation();
+    setCurrentImg((c) => (c - 1 + project.images.length) % project.images.length);
+  };
 
   return (
-<div className="min-h-screen p-8 bg-transparent pointer-events-auto">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="flex items-center gap-4 mb-8">
-          <Link 
-            to="/" 
-            className="flex items-center gap-2 text-card-foreground hover:text-muted-foreground transition-colors"
-          >
-            <ArrowLeft size={20} color="#ffd3ff"/>
-            <span className="text-sm uppercase tracking-wider text-[#ffd3ff]">Back</span>
-          </Link>
-          <div className="h-px bg-card-border flex-1"></div>
-          <h1 className="text-2xl font-bold text-card-foreground uppercase tracking-wider">Projects</h1>
+    <div
+      ref={ref}
+      className="project-card reveal"
+      style={{ transform, transition: 'transform 0.2s ease-out', '--i': index } as CSSProperties}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+    >
+      <div className="project-img-wrap">
+        <div style={{
+          position: 'absolute', inset: 0,
+          background: 'linear-gradient(135deg, #1a1a24, #0f0f18)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
+          <span style={{ color: 'var(--fg-muted)', fontFamily: 'var(--font-mono)', fontSize: '0.75rem', opacity: 0.5 }}>
+            {project.title}
+          </span>
         </div>
+        <img
+          src={project.images[currentImg]}
+          alt={project.title}
+          style={{ position: 'relative', zIndex: 1 }}
+          onError={(e) => { (e.target as HTMLImageElement).style.opacity = '0'; }}
+        />
+        <div className="project-img-overlay" />
 
-        {/* Projects Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {projects.map((project) => (
-            <Card key={project.id} className="bg-card border-2 border-card-border p-6 shadow-xl">
-              <div className="space-y-4">
-                <a
-                href={project.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs sm:text-sm md:text-base text-card-foreground uppercase relative after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-px after:bottom-0 after:left-0 after:bg-card-border after:origin-bottom-right after:transition-transform after:duration-700 hover:after:scale-x-100 hover:after:origin-bottom-left"
-              >
-                {project.title}
-              </a>
-                <p className="text-sm text-muted-foreground">{project.description}</p>
-                
-                {/* Image Carousel */}
-                <Carousel className="w-full">
-                  <CarouselContent>
-                    {project.images.map((image, index) => (
-                      <CarouselItem key={index}>
-                        <div className="aspect-video bg-muted rounded flex items-center justify-center overflow-hidden">
-                          <img 
-                            src={image} 
-                            alt={`Project ${project.title} Image ${index + 1}`}
-                            className="object-cover w-full h-full"
-                          />
-                          <div className="absolute w-full h-full bg-black/30"></div>
-                        </div>
-                      </CarouselItem>
-                    ))}
-                  </CarouselContent>
-                  <CarouselPrevious className="left-2" />
-                  <CarouselNext className="right-2" />
-                </Carousel>
+        {project.images.length > 1 && (
+          <>
+            <button className="img-nav prev" onClick={prevImg} aria-label="Previous">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="15 18 9 12 15 6" /></svg>
+            </button>
+            <button className="img-nav next" onClick={nextImg} aria-label="Next">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6" /></svg>
+            </button>
+            <div className="img-dots">
+              {project.images.map((_, i) => (
+                <button
+                  key={i}
+                  className={`img-dot${i === currentImg ? ' active' : ''}`}
+                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); setCurrentImg(i); }}
+                  aria-label={`Image ${i + 1}`}
+                />
+              ))}
+            </div>
+          </>
+        )}
+      </div>
 
-                {/* Technologies */}
-                <div className="space-y-2">
-                  <h4 className="text-xs text-card-foreground font-medium uppercase tracking-wider">Stack:</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {project.technologies.map((tech) => (
-                      <span 
-                        key={tech}
-                        className="px-2 py-1 bg-muted text-muted-foreground text-xs uppercase tracking-wider border border-card-border rounded"
-                      >
-                        {tech}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </Card>
+      <div className="project-body">
+        <div className="project-title">{project.title}</div>
+        <div className="project-desc">{project.description}</div>
+        <div className="project-tags">
+          {project.technologies.map((t) => (
+            <span key={t} className="project-tag">{t}</span>
           ))}
         </div>
+        <a href={project.link} target="_blank" rel="noopener noreferrer" className="project-link">
+          Открыть сайт
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="7" y1="17" x2="17" y2="7" /><polyline points="7 7 17 7 17 17" />
+          </svg>
+        </a>
       </div>
     </div>
   );
-};
+}
 
-export default Projects;
+export default function Projects() {
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) entry.target.classList.add('visible');
+        });
+      },
+      { threshold: 0.05, rootMargin: '0px 0px -40px 0px' }
+    );
+    document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <>
+      <WebGLBackground />
+      <div style={{ position: 'relative', zIndex: 1, padding: 'clamp(80px, 10vh, 120px) var(--gap) var(--section-pad)' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+          <Link to="/" className="back-link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="19" y1="12" x2="5" y2="12" /><polyline points="12 19 5 12 12 5" />
+            </svg>
+            Назад
+          </Link>
+
+          <div className="page-header reveal">
+            <h1 className="t-h1">
+              Наши <span className="accent-text">проекты</span>
+            </h1>
+            <div className="page-header-line" />
+          </div>
+
+          <div className="projects-grid">
+            {projects.map((p, i) => (
+              <ProjectCard key={p.id} project={p} index={i} />
+            ))}
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
