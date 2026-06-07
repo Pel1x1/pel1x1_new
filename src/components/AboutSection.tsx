@@ -28,8 +28,8 @@ export default function AboutSection() {
             </p>
             <div style={styles.stats}>
               {[
-                { num: '20+', label: 'Проектов' },
-                { num: '3+', label: 'Года опыта' },
+                { num: '10+', label: 'Проектов' },
+                { num: '2+', label: 'Года опыта' },
                 { num: '100%', label: 'Кастом' },
               ].map((s, i) => (
                 <div key={i} className="reveal" style={{ ...styles.stat, '--i': i } as CSSProperties}>
