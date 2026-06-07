@@ -12,7 +12,7 @@ export default function FooterSection() {
                 fontSize: 'clamp(2rem, 5vw, 3.2rem)', letterSpacing: '0.04em',
                 color: 'var(--accent)', lineHeight: 1.1, marginBottom: '12px',
               }}>
-                Начать <span style={{ fontSize: '0.6em', opacity: 0.7, fontWeight: 400 }}>&</span> создать
+                Нужен сайт?
               </h2>
               <div style={{ width: '70px', height: '2px', background: 'var(--gradient)', borderRadius: '1px', marginBottom: '12px' }} />
               <p className="t-caption" style={{ color: 'var(--fg)', letterSpacing: '0.15em' }}>
