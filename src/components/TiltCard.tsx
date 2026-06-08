@@ -24,7 +24,7 @@ export default function TiltCard({ children, index = 0 }: TiltCardProps) {
   return (
     <div
       ref={ref}
-      className="reveal"
+      className="tilt-wrap"
       style={{
         transform,
         transition: 'transform 0.2s ease-out',

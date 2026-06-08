@@ -1,5 +1,6 @@
+import { useRef, useEffect, type CSSProperties } from 'react';
 import TiltCard from './TiltCard';
-import type { CSSProperties } from 'react';
+import { gsap } from '@/lib/gsap';
 
 const testimonials = [
   {
@@ -23,8 +24,84 @@ const testimonials = [
 ];
 
 export default function TestimonialsSection() {
+  const sectionRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      const rotations = [-3, 0, 3];
+
+      gsap.utils.toArray<HTMLElement>('.testimonial-card').forEach((card, i) => {
+        const quote = card.querySelector('.testimonial-quote');
+        const author = card.querySelector('.testimonial-author');
+        const avatar = card.querySelector('.testimonial-avatar');
+
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: card,
+            start: 'top 85%',
+            toggleActions: 'play none none none',
+          },
+        });
+
+        tl.fromTo(card,
+          { opacity: 0, y: 50, rotation: rotations[i] || 0, scale: 0.9 },
+          {
+            opacity: 1, y: 0, rotation: 0, scale: 1,
+            duration: 0.8,
+            delay: i * 0.15,
+            ease: 'power3.out',
+          }
+        );
+
+        if (quote) {
+          tl.fromTo(quote,
+            { scale: 0.3, opacity: 0 },
+            { scale: 1, opacity: 0.6, duration: 0.5, ease: 'elastic.out(1, 0.5)' },
+            '-=0.5'
+          );
+        }
+
+        if (author) {
+          tl.fromTo(author,
+            { opacity: 0, y: 10 },
+            { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' },
+            '-=0.2'
+          );
+        }
+
+        if (avatar) {
+          tl.fromTo(avatar,
+            { scale: 0, rotation: -90 },
+            { scale: 1, rotation: 0, duration: 0.4, ease: 'back.out(2)' },
+            '-=0.3'
+          );
+        }
+
+        // Hover
+        card.addEventListener('mouseenter', () => {
+          gsap.to(card, {
+            boxShadow: '0 16px 50px #00000050, 0 0 25px #ffd3ff08',
+            borderColor: '#ffd3ff20',
+            duration: 0.3, ease: 'power2.out',
+          });
+          if (quote) gsap.to(quote, { scale: 1.15, opacity: 0.8, duration: 0.3, ease: 'power2.out' });
+        });
+        card.addEventListener('mouseleave', () => {
+          gsap.to(card, {
+            boxShadow: 'none',
+            borderColor: 'rgba(255,255,255,0.07)',
+            duration: 0.3, ease: 'power2.out',
+          });
+          if (quote) gsap.to(quote, { scale: 1, opacity: 0.6, duration: 0.3, ease: 'power2.out' });
+        });
+      });
+    }, sectionRef);
+
+    return () => ctx.revert();
+  }, []);
+
   return (
-    <section id="testimonials" className="section" style={{ position: 'relative' }}>
+    <section ref={sectionRef} id="testimonials" className="section" style={{ position: 'relative' }}>
       <div className="orb orb-pink" style={{
         width: 350, height: 350, top: '15%', left: '-8%', opacity: 0.07,
       }} />
@@ -38,16 +115,16 @@ export default function TestimonialsSection() {
           <div className="accent-line" style={{ margin: '0 auto' }} />
         </div>
 
-        <div style={styles.grid} className="stagger">
+        <div style={styles.grid}>
           {testimonials.map((t, i) => (
             <TiltCard key={i} index={i}>
-              <div className="glass-card" style={styles.card}>
-                <div style={styles.quote}>"</div>
+              <div className="glass-card testimonial-card card-hover-glow" style={styles.card}>
+                <div className="testimonial-quote" style={styles.quote}>"</div>
                 <p className="t-body" style={{ color: 'var(--fg-muted)', fontSize: '0.95rem', lineHeight: 1.7, marginBottom: '24px', flex: 1 }}>
                   {t.text}
                 </p>
-                <div style={styles.author}>
-                  <div style={styles.avatar}>
+                <div className="testimonial-author" style={styles.author}>
+                  <div className="testimonial-avatar" style={styles.avatar}>
                     <span style={{ fontSize: '0.75rem', fontWeight: 600 }}>{t.initials}</span>
                   </div>
                   <div>
@@ -76,6 +153,8 @@ const styles: Record<string, CSSProperties> = {
     display: 'flex',
     flexDirection: 'column',
     position: 'relative',
+    overflow: 'hidden',
+    transition: 'border-color 0.3s, box-shadow 0.3s',
   },
   quote: {
     fontFamily: 'Georgia, serif',
@@ -87,6 +166,7 @@ const styles: Record<string, CSSProperties> = {
     backgroundClip: 'text',
     marginBottom: '-10px',
     opacity: 0.6,
+    transformOrigin: 'left top',
   },
   author: {
     display: 'flex',

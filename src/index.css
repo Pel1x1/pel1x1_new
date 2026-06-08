@@ -174,29 +174,13 @@ a { color: inherit; text-decoration: none; }
   border-color: var(--border-h);
 }
 
-/* ── Scroll reveal ── */
+/* ── Scroll reveal (GSAP-driven, initial state only) ── */
 .reveal {
   opacity: 0;
-  transform: translateY(40px);
-  transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1),
-              transform 0.8s cubic-bezier(0.16,1,0.3,1);
-}
-.reveal.visible {
-  opacity: 1;
-  transform: translateY(0);
 }
 .reveal-left {
   opacity: 0;
-  transform: translateX(-40px);
-  transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1),
-              transform 0.8s cubic-bezier(0.16,1,0.3,1);
 }
-.reveal-left.visible {
-  opacity: 1;
-  transform: translateX(0);
-}
-
-.stagger > * { transition-delay: calc(var(--i, 0) * 0.08s); }
 
 /* ── Section wrapper ── */
 .section {
@@ -517,22 +501,60 @@ a { color: inherit; text-decoration: none; }
   50% { transform: translateX(-50%) translateY(8px); }
 }
 
-@keyframes techFadeIn {
-  from { opacity: 0; transform: translateX(20px); }
-  to { opacity: 1; transform: translateX(0); }
+/* ── Card glow orb (follows cursor) ── */
+.card-hover-glow {
+  position: relative;
+  overflow: hidden;
+}
+.card-glow-orb {
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffd3ff12 0%, transparent 70%);
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  scale: 0.5;
+  z-index: 0;
 }
 
-@keyframes procPulse {
-  0%, 100% { box-shadow: 0 0 0 0 #ffd3ff30; }
-  50% { box-shadow: 0 0 0 8px #ffd3ff00; }
+/* ── Process card ── */
+.process-card {
+  will-change: transform, opacity;
+}
+.process-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--gradient);
+  transform: scaleX(0);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+.process-card:hover::before {
+  transform: scaleX(1);
 }
 
-@keyframes procNumReveal {
-  from { opacity: 0; transform: scale(0.5) translateY(10px); }
-  to { opacity: 1; transform: scale(1) translateY(0); }
+/* ── Card shine sweep ── */
+.glass-card {
+  position: relative;
 }
-
-@keyframes carouselCardIn {
-  from { opacity: 0; transform: translateY(30px) scale(0.97); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+.glass-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, #ffd3ff06, transparent);
+  pointer-events: none;
+  z-index: 0;
+  transition: left 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.glass-card:hover::before {
+  left: 160%;
 }

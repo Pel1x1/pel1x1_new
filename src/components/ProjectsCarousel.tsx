@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect, useCallback, type CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
 import { projects, type Project } from '@/data/projects';
+import { gsap } from '@/lib/gsap';
 
 function CarouselCard({ project, index, dragRef }: {
   project: Project;
@@ -20,7 +21,7 @@ function CarouselCard({ project, index, dragRef }: {
   return (
     <div
       data-carousel-card
-      className="reveal"
+      className="carousel-card"
       style={{ ...pcStyles.card, '--i': index } as CSSProperties}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
@@ -86,18 +87,63 @@ export default function ProjectsCarousel() {
   const dragState = useRef({ startX: 0, scrollLeft: 0, dragging: false, moved: false });
 
   useEffect(() => {
-    const root = sectionRef.current;
-    if (!root) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) entry.target.classList.add('visible');
+    const ctx = gsap.context(() => {
+      gsap.utils.toArray<HTMLElement>('.carousel-card').forEach((card, i) => {
+        gsap.fromTo(card,
+          { opacity: 0, y: 40, scale: 0.92 },
+          {
+            opacity: 1, y: 0, scale: 1,
+            duration: 0.7,
+            delay: i * 0.1,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: sectionRef.current,
+              start: 'top 75%',
+              toggleActions: 'play none none none',
+            },
+          }
+        );
+
+        // Hover: lift + glow
+        card.addEventListener('mouseenter', () => {
+          gsap.to(card, {
+            y: -6,
+            boxShadow: '0 20px 50px #00000050, 0 0 30px #ffd3ff08',
+            borderColor: '#ffd3ff20',
+            duration: 0.3, ease: 'power2.out',
+          });
         });
-      },
-      { threshold: 0.05, rootMargin: '0px 0px -40px 0px' }
-    );
-    root.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
+        card.addEventListener('mouseleave', () => {
+          gsap.to(card, {
+            y: 0,
+            boxShadow: 'none',
+            borderColor: 'rgba(255,255,255,0.07)',
+            duration: 0.3, ease: 'power2.out',
+          });
+        });
+      });
+
+      // CTA card entrance
+      const ctaCard = sectionRef.current?.querySelector('.carousel-cta');
+      if (ctaCard) {
+        gsap.fromTo(ctaCard,
+          { opacity: 0, scale: 0.85 },
+          {
+            opacity: 1, scale: 1,
+            duration: 0.7,
+            delay: projects.length * 0.1,
+            ease: 'back.out(1.5)',
+            scrollTrigger: {
+              trigger: sectionRef.current,
+              start: 'top 75%',
+              toggleActions: 'play none none none',
+            },
+          }
+        );
+      }
+    }, sectionRef);
+
+    return () => ctx.revert();
   }, []);
 
   const checkScroll = useCallback(() => {
@@ -189,7 +235,7 @@ export default function ProjectsCarousel() {
           <CarouselCard key={project.id} project={project} index={i} dragRef={dragState} />
         ))}
 
-        <div data-carousel-card style={pcStyles.ctaCard} className="reveal">
+        <div data-carousel-card className="carousel-cta" style={pcStyles.ctaCard}>
           <div style={pcStyles.ctaInner}>
             <span style={pcStyles.ctaIcon}>
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -247,7 +293,7 @@ const pcStyles: Record<string, CSSProperties> = {
     flexShrink: 0, width: 'clamp(300px, 28vw, 380px)', background: '#0c0c10',
     border: '1px solid var(--border)', borderRadius: 'var(--radius)',
     overflow: 'hidden', position: 'relative', scrollSnapAlign: 'start',
-    transition: 'border-color 0.4s, box-shadow 0.4s, transform 0.4s',
+    transition: 'border-color 0.3s, box-shadow 0.3s',
   },
   cardImgWrap: {
     position: 'relative', aspectRatio: '16 / 10', overflow: 'hidden', background: '#0a0a0e',

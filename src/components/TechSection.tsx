@@ -1,4 +1,5 @@
-import { useState, type CSSProperties } from 'react';
+import { useState, useRef, useCallback, type CSSProperties } from 'react';
+import { gsap } from '@/lib/gsap';
 
 const categories = [
   {
@@ -29,7 +30,41 @@ const categories = [
 
 export default function TechSection() {
   const [activeIdx, setActiveIdx] = useState(0);
+  const panelRef = useRef<HTMLDivElement>(null);
   const active = categories[activeIdx];
+
+  const switchTab = useCallback((idx: number) => {
+    if (idx === activeIdx || !panelRef.current) {
+      setActiveIdx(idx);
+      return;
+    }
+
+    const panel = panelRef.current;
+    const dir = idx > activeIdx ? 1 : -1;
+
+    gsap.to(panel, {
+      opacity: 0,
+      x: -20 * dir,
+      duration: 0.2,
+      ease: 'power2.in',
+      onComplete: () => {
+        setActiveIdx(idx);
+        gsap.fromTo(panel,
+          { opacity: 0, x: 20 * dir },
+          { opacity: 1, x: 0, duration: 0.35, ease: 'power2.out' }
+        );
+
+        // Stagger tech items
+        requestAnimationFrame(() => {
+          const items = panel.querySelectorAll('.tech-item');
+          gsap.fromTo(items,
+            { opacity: 0, x: 25 },
+            { opacity: 1, x: 0, duration: 0.4, stagger: 0.06, ease: 'power2.out' }
+          );
+        });
+      },
+    });
+  }, [activeIdx]);
 
   return (
     <section id="tech" className="section" style={{ position: 'relative' }}>
@@ -106,7 +141,7 @@ export default function TechSection() {
           {categories.map((cat, i) => (
             <button
               key={i}
-              onClick={() => setActiveIdx(i)}
+              onClick={() => switchTab(i)}
               className={`tech-tab${i === activeIdx ? ' tech-tab--active' : ''}`}
             >
               <span className="tech-tab__icon">{cat.icon}</span>
@@ -115,7 +150,7 @@ export default function TechSection() {
           ))}
         </div>
 
-        <div className="reveal" style={styles.panel}>
+        <div ref={panelRef} className="reveal" style={styles.panel}>
           <div style={styles.panelLeft}>
             <div style={styles.bigNum}>{String(activeIdx + 1).padStart(2, '0')}</div>
             <h3 className="t-h1" style={{ marginBottom: 8 }}>{active.title}</h3>
@@ -123,10 +158,7 @@ export default function TechSection() {
           </div>
           <div style={styles.panelRight}>
             {active.techs.map((t, j) => (
-              <div
-                key={`${activeIdx}-${j}`}
-                style={{ ...styles.techItem, animationDelay: `${j * 0.08}s` }}
-              >
+              <div key={`${activeIdx}-${j}`} className="tech-item" style={styles.techItem}>
                 <div style={styles.techDot} />
                 <span className="t-mono" style={{ fontSize: 'clamp(0.85rem, 1.2vw, 1rem)', color: 'var(--fg)' }}>
                   {t}
@@ -184,7 +216,6 @@ const styles: Record<string, CSSProperties> = {
     gap: '14px',
     padding: '10px 0',
     borderBottom: '1px solid #ffffff08',
-    animation: 'techFadeIn 0.4s cubic-bezier(0.16,1,0.3,1) both',
   },
   techDot: {
     width: '6px',

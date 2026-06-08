@@ -1,8 +1,16 @@
 import { useRef, useState, useEffect, type CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
+import { gsap } from '@/lib/gsap';
+
+const brandChars = ['K', ' ', '&', ' ', 'K'];
 
 export default function HeroSection() {
   const cardRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
+  const lineRef = useRef<HTMLDivElement>(null);
+  const taglineRef = useRef<HTMLParagraphElement>(null);
+  const navRef = useRef<HTMLElement>(null);
+  const contactRef = useRef<HTMLDivElement>(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [scrollY, setScrollY] = useState(0);
 
@@ -10,6 +18,77 @@ export default function HeroSection() {
     const handleScroll = () => setScrollY(window.scrollY);
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({ delay: 0.5 });
+
+      if (cardRef.current) {
+        gsap.set(cardRef.current, { opacity: 0, scale: 0.92, y: 30 });
+        tl.to(cardRef.current, {
+          opacity: 1, scale: 1, y: 0,
+          duration: 1, ease: 'power3.out',
+        });
+      }
+
+      const chars = sectionRef.current?.querySelectorAll('.hero-char');
+      if (chars?.length) {
+        gsap.set(chars, { opacity: 0, y: 40, rotateX: -90, display: 'inline-block' });
+        tl.to(chars, {
+          opacity: 1, y: 0, rotateX: 0,
+          duration: 0.6, stagger: 0.07,
+          ease: 'back.out(2)',
+        }, '-=0.5');
+      }
+
+      if (lineRef.current) {
+        gsap.set(lineRef.current, { scaleX: 0, transformOrigin: 'left center' });
+        tl.to(lineRef.current, {
+          scaleX: 1, duration: 0.5, ease: 'power2.out',
+        }, '-=0.2');
+      }
+
+      if (taglineRef.current) {
+        const originalText = taglineRef.current.textContent || '';
+        gsap.set(taglineRef.current, { opacity: 1 });
+        tl.fromTo(taglineRef.current,
+          { opacity: 0 },
+          {
+            opacity: 1, duration: 0.7,
+            scrambleText: {
+              text: originalText,
+              chars: 'абвгдежз░▒▓█',
+              speed: 0.9,
+              revealDelay: 0.1,
+            },
+          }, '-=0.15'
+        );
+      }
+
+      if (navRef.current) {
+        const links = navRef.current.children;
+        gsap.set(links, { opacity: 0, y: 20 });
+        tl.to(links, {
+          opacity: 1, y: 0,
+          duration: 0.4, stagger: 0.07,
+          ease: 'power2.out',
+        }, '-=0.4');
+      }
+
+      if (contactRef.current) {
+        const items = contactRef.current.children;
+        gsap.set(items, { opacity: 0, x: -15 });
+        tl.to(items, {
+          opacity: 1, x: 0,
+          duration: 0.4, stagger: 0.08,
+          ease: 'power2.out',
+        }, '-=0.2');
+      }
+
+    }, sectionRef);
+
+    return () => ctx.revert();
   }, []);
 
   const handleMouseMove = (e: React.MouseEvent) => {
@@ -30,6 +109,7 @@ export default function HeroSection() {
 
   return (
     <section
+      ref={sectionRef}
       id="hero"
       style={styles.section}
       onMouseMove={handleMouseMove}
@@ -49,7 +129,7 @@ export default function HeroSection() {
       <div style={styles.content}>
         <div
           ref={cardRef}
-          className="tilt-card reveal"
+          className="tilt-card"
           style={{
             ...styles.cardWrapper,
             transform: `perspective(1200px) rotateX(${cardRotateX}deg) rotateY(${cardRotateY}deg) translateY(${-parallaxOffset * 0.15}px)`,
@@ -64,15 +144,23 @@ export default function HeroSection() {
             <div style={styles.cardInner}>
               <div>
                 <h1 style={styles.brandName}>
-                  K <span style={styles.ampersand}>&</span> K
+                  {brandChars.map((ch, i) => (
+                    <span
+                      key={i}
+                      className="hero-char"
+                      style={ch === '&' ? styles.ampersand : undefined}
+                    >
+                      {ch}
+                    </span>
+                  ))}
                 </h1>
-                <div style={styles.brandLine} />
-                <p className="t-caption" style={styles.tagline}>
+                <div ref={lineRef} style={styles.brandLine} />
+                <p ref={taglineRef} className="t-caption" style={styles.tagline}>
                   Web решения для бизнеса
                 </p>
               </div>
 
-              <nav style={styles.cardNav}>
+              <nav ref={navRef} style={styles.cardNav}>
                 {[
                   { label: 'Проекты', href: '/projects', isRoute: true },
                   { label: 'Технологии', href: '#tech' },
@@ -103,7 +191,7 @@ export default function HeroSection() {
                 )}
               </nav>
 
-              <div style={styles.contactRow}>
+              <div ref={contactRef} style={styles.contactRow}>
                 <a href="https://t.me/k_k0stya" target="_blank" rel="noopener noreferrer" style={styles.contactItem}>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
@@ -192,6 +280,7 @@ const styles: Record<string, CSSProperties> = {
     letterSpacing: '0.04em',
     color: 'var(--accent)',
     lineHeight: 1.1,
+    perspective: '500px',
   },
   ampersand: {
     fontSize: '0.6em',
